@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+
+
+    <context:property-placeholder location="classpath:db.properties"/>
+
+    <!--数据源-->
+    <bean id="druidDataSource" class="com.alibaba.druid.pool.DruidDataSource">
+        <property name="driverClassName" value="${mysql.driverClassName}"/>
+        <property name="url" value="${mysql.url}"/>
+        <property name="username" value="${mysql.username}"/>
+        <property name="password" value="${mysql.password}"/>
+    </bean>
+
+    <!--事务管理-->
+    <bean id="transactionManager"
+          class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+        <constructor-arg ref="druidDataSource" type="javax.sql.DataSource"/>
+    </bean>
+
+
+    <!--mybatis工厂-->
+    <bean id="sqlSessionFactoryBean" class="org.mybatis.spring.SqlSessionFactoryBean">
+        <!--配置文件位置-->
+        <property name="configLocation" value="classpath:MyBatisConfig.xml"/>
+        <!--数据源-->
+        <property name="dataSource" ref="druidDataSource"/>
+        <!--别名，大小写不敏感-->
+        <property name="typeAliasesPackage" value="com.cqupt.model"/>
+        <!--mapper.xlm文件位置-->
+        <property name="mapperLocations" value="classpath:com/cqupt/dao/*.xml"/>
+    </bean>
+
+
+    <!--mapper接口扫描-->
+    <bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+        <property name="basePackage" value="com.cqupt.dao"/>
+        <property name="sqlSessionFactoryBeanName" value="sqlSessionFactoryBean"/>
+    </bean>
+
+
+</beans>
